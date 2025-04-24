@@ -10,68 +10,72 @@ const Grades = () => {
   const [students, setStudents] = useState([]);
   const [date] = useState(new Date().toISOString().split('T')[0]);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('rollNumber');
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [markFilter, setMarkFilter] = useState('all');
+  const [weightage, setWeightage] = useState('');
+  const [totalMarks, setTotalMarks] = useState('');
+  const [minScore, setMinScore] = useState('');
+  const [maxScore, setMaxScore] = useState('');
+  const [stdDev, setStdDev] = useState('');
 
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    const fetchGradesAndStudents = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(`/api/grades/${classId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setGradesList(res.data);
+        const [gradesRes, classesRes] = await Promise.all([
+          axios.get(`/api/grades/${classId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get(`/api/teacher/classes`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        ]);
 
-        const classRes = await axios.get('/api/teacher/classes', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const cls = classRes.data.find((c) => c._id === classId);
+        setGradesList(gradesRes.data);
+        const cls = classesRes.data.find((c) => c._id === classId);
         setStudents(cls.students);
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchGradesAndStudents();
+    fetchData();
   }, [classId, token]);
 
   const handleAssignmentSelect = () => {
-  const type = assignmentType.trim();
-  if (!type) return;
-
-  const existing = gradesList.find(
-        (g) => g.assignmentType === type
-       );
-  if (existing) {
-    // Load today's grades
-    setRecords(
-      existing.grades.map((g) => ({
-        studentId: g.studentId._id,
-        name: g.studentId.name,
-        rollNumber: g.studentId.rollNumber,
-        marks: g.marks
-      }))
-    ); 
-  } else {
-    const proceed = window.confirm(
-      `Assignment type "${type}" doesn't exist. Do you want to create it?`
+    const existing = gradesList.find(
+      (g) => g.assignmentType === assignmentType
     );
-    if (!proceed) return;
 
-    // New assignment type
-    setRecords(
-      students.map((s) => ({
-        studentId: s._id,
-        name: s.name,
-        rollNumber: s.rollNumber,
-        marks: 0
-      }))
-    );
-  }
-};
+    if (existing) {
+      setWeightage(existing.weightage);
+      setTotalMarks(existing.totalMarks);
+      setMinScore(existing.minScore);
+      setMaxScore(existing.maxScore);
+      setStdDev(existing.stdDev.toFixed(2));
+      setRecords(
+        existing.grades.map((g) => ({
+          studentId: g.studentId._id,
+          name: g.studentId.name,
+          rollNumber: g.studentId.rollNumber,
+          marks: g.marks
+        }))
+      );
+    } else {
+      setWeightage('');
+      setTotalMarks('');
+      setMinScore(0);
+      setMaxScore(0);
+      setStdDev(0);
+      setRecords(
+        students.map((s) => ({
+          studentId: s._id,
+          name: s.name,
+          rollNumber: s.rollNumber,
+          marks: 0
+        }))
+      );
+    }
+  };
 
   const handleMarkChange = (index, value) => {
     const updated = [...records];
@@ -87,6 +91,8 @@ const Grades = () => {
           classId,
           assignmentType,
           date,
+          weightage: parseFloat(weightage),
+          totalMarks: parseFloat(totalMarks),
           grades: records.map((r) => ({
             studentId: r.studentId,
             marks: r.marks
@@ -104,45 +110,39 @@ const Grades = () => {
   return (
     <div className="page-container">
       <h2>Grades</h2>
-      <label>Assignment Type: </label>
       <input
         type="text"
+        placeholder="Assignment Type (e.g. Quiz 1)"
         value={assignmentType}
         onChange={(e) => setAssignmentType(e.target.value)}
-        placeholder="e.g. Quiz 1"
       />
       <button onClick={handleAssignmentSelect}>Load</button>
 
       {records.length > 0 && (
         <>
-          <div style={{ marginTop: '20px' }}>
+          <div>
             <input
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              type="number"
+              placeholder="Weightage (%)"
+              value={weightage}
+              onChange={(e) => setWeightage(e.target.value)}
             />
-
-          <div className="filter-bar">
-            <select value={markFilter} onChange={(e) => setMarkFilter(e.target.value)}>
-              <option value="all">All Marks</option>
-              <option value="above50">Above 50</option>
-              <option value="below50">50 & Below</option>
-            </select>
-
-            <select value={sortField} onChange={(e) => setSortField(e.target.value)}>
-              <option value="rollNumber">Roll Number</option>
-              <option value="name">Name</option>
-            </select>
-
-            <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
-          </div>
+            <input
+              type="number"
+              placeholder="Total Marks"
+              value={totalMarks}
+              onChange={(e) => setTotalMarks(e.target.value)}
+            />
           </div>
 
-          <table border="1" style={{ marginTop: '20px', width: '100%' }}>
+          {/* Show calculated values if viewing existing */}
+          {minScore !== 0 && (
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Min:</strong> {minScore} | <strong>Max:</strong> {maxScore} | <strong>Std Dev:</strong> {stdDev}
+            </div>
+          )}
+
+          <table>
             <thead>
               <tr>
                 <th>Roll No.</th>
@@ -151,43 +151,28 @@ const Grades = () => {
               </tr>
             </thead>
             <tbody>
-              {records
-                .filter((s) => {
-                  const matchSearch =
-                    s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    s.rollNumber.toLowerCase().includes(searchTerm.toLowerCase());
-                  const matchMarks =
-                    markFilter === 'all' ||
-                    (markFilter === 'above50' && s.marks > 50) ||
-                    (markFilter === 'below50' && s.marks <= 50);
-                  return matchSearch && matchMarks;
-                })
-                .sort((a, b) => {
-                  const valA = a[sortField].toLowerCase();
-                  const valB = b[sortField].toLowerCase();
-                  if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-                  if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
-                  return 0;
-                })
-                .map((student, index) => (
-                  <tr key={student.studentId}>
-                    <td>{student.rollNumber}</td>
-                    <td>{student.name}</td>
-                    <td>
-                      <input
-                        type="number"
-                        value={student.marks}
-                        onChange={(e) => handleMarkChange(index, e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                ))}
+              {records.map((student, index) => (
+                <tr key={student.studentId}>
+                  <td>{student.rollNumber}</td>
+                  <td>{student.name}</td>
+                  <td>
+                    <div>
+                    <input
+                      type="number"
+                      value={student.marks}
+                      onChange={(e) => handleMarkChange(index, e.target.value)}
+                    />
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
 
-          <button onClick={handleSave} style={{ marginTop: '20px' }}>
-            Save Grades
-          </button>
+            <button style={{ marginTop: '20px' }} onClick={handleSave}>
+              Save Grades
+            </button>
+          
         </>
       )}
     </div>
@@ -195,4 +180,3 @@ const Grades = () => {
 };
 
 export default Grades;
-

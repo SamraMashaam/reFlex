@@ -28,11 +28,7 @@ form {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-input[type='text'],
-input[type='email'],
-input[type='password'],
-input[type='number'],
-input[type='date'],
+input,
 select {
   width: 100%;
   padding: 10px;
@@ -42,6 +38,7 @@ select {
   border: 1px solid #ccc;
   box-sizing: border-box;
 }
+
 
 button {
   background-color: #441752;
