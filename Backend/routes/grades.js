@@ -5,7 +5,11 @@ const Grade = require('../models/Grade');
 const Student = require('../models/Student');
 
 
+<<<<<<< HEAD
 // Helper function to convert numerical grade to grade point
+=======
+// Convert numerical grade to grade point
+>>>>>>> d7704bc (Updates to frontend)
 const convertGradeToPoint = (marks) => {
   if (marks >= 90) return 4.0;
   if (marks >= 80) return 3.7;
@@ -26,7 +30,10 @@ router.get('/:classId/:rollNumber', async (req, res) => {
     const student = await Student.findOne({ rollNumber });
     if (!student) return res.status(404).json({ error: 'Student not found' });
 
+<<<<<<< HEAD
     // Convert classId to ObjectId
+=======
+>>>>>>> d7704bc (Updates to frontend)
     const classObjectId = new mongoose.Types.ObjectId(classId);
 
     // Find grades records for the class and student

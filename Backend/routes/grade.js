@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 // routes/grade.js
+=======
+>>>>>>> d7704bc (Updates to frontend)
 const express = require('express');
 const router = express.Router();
 const Grade = require('../models/Grade');
@@ -48,7 +51,11 @@ router.post('/grade', async (req, res) => {
         student.transcript.push(semester);
       }
 
+<<<<<<< HEAD
       // Check if course already exists in transcript (to avoid duplicates)
+=======
+      // Check if course already exists in transcript
+>>>>>>> d7704bc (Updates to frontend)
       const courseExists = semester.courses.find((c) => c.code === classData.code);
       if (!courseExists) {
         semester.courses.push({
@@ -68,10 +75,15 @@ router.post('/grade', async (req, res) => {
           semester.creditEarned += classData.creditHours;
         }
 
+<<<<<<< HEAD
         // Recalculate SGPA
         semester.sgpa = calculateSGPA(semester.courses);
 
         // Recalculate CGPA
+=======
+        // Recalculate SGPA & CGPA
+        semester.sgpa = calculateSGPA(semester.courses);
+>>>>>>> d7704bc (Updates to frontend)
         student.currentCGPA = calculateCGPA(student.transcript);
 
         await student.save();

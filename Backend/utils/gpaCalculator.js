@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 // utils/gpaCalculator.js
+=======
+>>>>>>> d7704bc (Updates to frontend)
 const calculateSGPA = (courses) => {
     let totalPoints = 0;
     let totalCreditHours = 0;

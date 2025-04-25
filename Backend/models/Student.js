@@ -1,4 +1,8 @@
 const mongoose = require('mongoose');
+<<<<<<< HEAD
+=======
+const bcrypt = require('bcryptjs');
+>>>>>>> d7704bc (Updates to frontend)
 
 const transcriptCourseSchema = new mongoose.Schema({
   code: String,
@@ -21,7 +25,11 @@ const transcriptSemesterSchema = new mongoose.Schema({
 
 const studentSchema = new mongoose.Schema({
   name: { type: String, required: true },
+<<<<<<< HEAD
   rollNumber: { type: String, required: true, unique: true },
+=======
+  rollNumber: { type: String, required: true, unique: true, match: /^[0-9]{2}[A-Z]-[0-9]{4}$/ },
+>>>>>>> d7704bc (Updates to frontend)
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   degree: { type: String, required: true },
@@ -60,9 +68,25 @@ const studentSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
+<<<<<<< HEAD
 studentSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
+=======
+// Hashing password before saving
+studentSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+  next();
+});
+
+// Compare Passwords
+studentSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+>>>>>>> d7704bc (Updates to frontend)
 module.exports = mongoose.model('Student', studentSchema);

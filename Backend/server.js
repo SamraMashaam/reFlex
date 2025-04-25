@@ -3,6 +3,10 @@ const connectDB = require("./config/db");
 const errorHandler = require("./middlewares/errorHandler.js");
 const cors = require("cors");
 
+<<<<<<< HEAD
+=======
+const authRoutes = require('./routes/auth.js');
+>>>>>>> d7704bc (Updates to frontend)
 const studentRoutes = require('./routes/student.js'); 
 const studentAttendance = require('./routes/studentAttendance.js');
 const studentGrades = require('./routes/grades.js');
@@ -16,6 +20,10 @@ app.use(express.json());
 connectDB();
 
 // Routes
+<<<<<<< HEAD
+=======
+app.use('/api', authRoutes);
+>>>>>>> d7704bc (Updates to frontend)
 app.use('/api/student', studentRoutes);
 app.use('/api/attendance',studentAttendance);
 app.use('/api/grades', studentGrades);

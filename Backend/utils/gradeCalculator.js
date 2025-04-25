@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 // utils/gradeCalculator.js
+=======
+>>>>>>> d7704bc (Updates to frontend)
 const calculateCourseGrade = (grades, totalWeightage = 100) => {
     let totalWeightedMarks = 0;
     let totalWeight = 0;
@@ -11,7 +14,11 @@ const calculateCourseGrade = (grades, totalWeightage = 100) => {
   
     const finalMarks = totalWeight > 0 ? (totalWeightedMarks / totalWeight) * 100 : 0;
   
+<<<<<<< HEAD
     // Example grading scale (adjust as per your institution's policy)
+=======
+    // Grading scale 
+>>>>>>> d7704bc (Updates to frontend)
     if (finalMarks >= 90) return { grade: 'A+', points: 4.0 };
     if (finalMarks >= 85) return { grade: 'A', points: 4.0 };
     if (finalMarks >= 80) return { grade: 'A-', points: 3.67 };
